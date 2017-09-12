@@ -1,7 +1,7 @@
 # CIS Debian 7 Hardening Utility functions
 
 #
-# Sysctl 
+# Sysctl
 #
 
 has_sysctl_param_expected_result() {
@@ -45,7 +45,7 @@ set_sysctl_param() {
 }
 
 #
-# Dmesg 
+# Dmesg
 #
 
 does_pattern_exist_in_dmesg() {
@@ -58,7 +58,7 @@ does_pattern_exist_in_dmesg() {
 }
 
 #
-# File 
+# File
 #
 
 does_file_exist() {
@@ -87,31 +87,33 @@ has_file_correct_ownership() {
 has_file_correct_permissions() {
     local FILE=$1
     local PERMISSIONS=$2
-    
+
     if [ $(stat -L -c "%a" $1) = "$PERMISSIONS" ]; then
         FNRET=0
     else
         FNRET=1
-    fi 
+    fi
 }
 
 does_pattern_exist_in_file() {
-    local FILE=$1
+    local FILES=$1
     local PATTERN=$2
 
-    debug "Checking if $PATTERN is present in $FILE"
-    if [ -r "$FILE" ] ; then
-        debug "grep -qE -- '$PATTERN' $FILE"
-        if $(grep -qE -- "$PATTERN" $FILE); then
-            FNRET=0
+    debug "Checking if $PATTERN is present in $FILES"
+    for FILE in $FILES; do
+        if [ -r "$FILE" ] ; then
+            debug "grep -qE -- '$PATTERN' $FILE"
+            if $(grep -qE -- "$PATTERN" $FILE); then
+                FNRET=0
+                return
+            else
+                FNRET=1
+            fi
         else
-            FNRET=1
+            debug "File $FILE is not readable!"
+            FNRET=2
         fi
-    else
-        debug "File $FILE is not readable!"
-        FNRET=2
-    fi
-
+    done
 }
 
 add_end_of_file() {
@@ -122,7 +124,7 @@ add_end_of_file() {
     backup_file "$FILE"
     echo "$LINE" >> $FILE
 }
-    
+
 add_line_file_before_pattern() {
     local FILE=$1
     local LINE=$2
@@ -248,7 +250,7 @@ is_kernel_option_enabled() {
 }
 
 #
-# Mounting point 
+# Mounting point
 #
 
 # Verify $1 is a partition declared in fstab
@@ -309,7 +311,7 @@ add_option_to_fstab() {
     local OPTION=$2
     debug "Setting $OPTION for $PARTITION in fstab"
     backup_file "/etc/fstab"
-    # For example : 
+    # For example :
     # /dev/sda9       /home           ext4  auto,acl,errors=remount-ro  0       2
     # /dev/sda9       /home           ext4  auto,acl,errors=remount-ro,nodev  0       2
     debug "Sed command :  sed -ie \"s;\(.*\)\(\s*\)\s\($PARTITION\)\s\(\s*\)\(\w*\)\(\s*\)\(\w*\)*;\1\2 \3 \4\5\6\7,$OPTION;\" /etc/fstab"
@@ -323,10 +325,10 @@ remount_partition() {
 }
 
 #
-# APT 
+# APT
 #
 
-apt_update_if_needed() 
+apt_update_if_needed()
 {
     if [ -e /var/cache/apt/pkgcache.bin ]
     then
@@ -346,7 +348,7 @@ apt_check_updates()
 {
     local NAME="$1"
     local DETAILS="/dev/shm/${NAME}"
-    apt-get upgrade -s 2>/dev/null | grep -E "^Inst" > $DETAILS || : 
+    apt-get upgrade -s 2>/dev/null | grep -E "^Inst" > $DETAILS || :
     local COUNT=$(wc -l < "$DETAILS")
     FNRET=128 # Unknown function return result
     RESULT="" # Result output for upgrade
@@ -360,7 +362,7 @@ apt_check_updates()
     rm $DETAILS
 }
 
-apt_install() 
+apt_install()
 {
     local PACKAGE=$1
     DEBIAN_FRONTEND='noninteractive' apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install $PACKAGE -y
