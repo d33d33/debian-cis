@@ -240,8 +240,9 @@ is_kernel_option_enabled() {
                 FNRET=1 # Not found (found but blacklisted)
                 # FIXME: even if blacklisted, it might be present in the initrd and
                 # be insmod from there... but painful to check :/ maybe lsmod would be enough ?
+            else
+              FNRET=0 # Found!
             fi
-            FNRET=0 # Found!
         fi
     fi
 }
