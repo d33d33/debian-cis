@@ -21,6 +21,13 @@ OPTION="nodev"
 audit () {
     info "Verifying that $PARTITION is a partition"
     FNRET=0
+
+    if [ -L $PARTITION ]; then
+      info "$PARTITION is a symlink"
+      PARTITION=$(readlink -n /run/shm)
+      info "Switching to $PARTITION"
+    fi
+
     is_a_partition "$PARTITION"
     if [ $FNRET -gt 0 ]; then
         crit "$PARTITION is not a partition"
@@ -36,11 +43,11 @@ audit () {
             has_mounted_option $PARTITION $OPTION
             if [ $FNRET -gt 0 ]; then
                 warn "$PARTITION is not mounted with $OPTION at runtime"
-                FNRET=3 
+                FNRET=3
             else
                 ok "$PARTITION mounted with $OPTION"
             fi
-        fi       
+        fi
     fi
 }
 
@@ -58,7 +65,7 @@ apply () {
     elif [ $FNRET = 3 ]; then
         info "Remounting $PARTITION from fstab"
         remount_partition $PARTITION
-    fi 
+    fi
 }
 
 # This function will check config parameters required
@@ -77,7 +84,7 @@ else
         echo "No CIS_ROOT_DIR variable, aborting"
         exit 128
     fi
-fi 
+fi
 
 # Main function, will call the proper functions given the configuration (audit, enabled, disabled)
 if [ -r $CIS_ROOT_DIR/lib/main.sh ]; then
