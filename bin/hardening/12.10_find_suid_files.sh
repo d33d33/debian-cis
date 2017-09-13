@@ -42,7 +42,7 @@ create_config() {
     cat <<EOF
 status=disabled
 # Put Here your valid suid binaries so that they do not appear during the audit
-EXCEPTIONS="/bin/mount /bin/ping /bin/ping6 /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/fping /usr/bin/fping6 /usr/bin/gpasswd /usr/bin/mtr /usr/bin/newgrp /usr/bin/passwd /usr/bin/sudo /usr/bin/sudoedit /usr/lib/openssh/ssh-keysign /usr/lib/pt_chown /usr/bin/at"
+EXCEPTIONS="/bin/mount /bin/ping /bin/ping6 /bin/su /bin/umount /usr/bin/chfn /usr/bin/chsh /usr/bin/fping /usr/bin/fping6 /usr/bin/gpasswd /usr/bin/mtr /usr/bin/newgrp /usr/bin/passwd /usr/bin/sudo /usr/bin/sudoedit /usr/lib/openssh/ssh-keysign /usr/lib/pt_chown /usr/bin/at /usr/lib/dbus-1.0/dbus-daemon-launch-helper"
 EOF
 }
 
@@ -62,7 +62,7 @@ else
         echo "No CIS_ROOT_DIR variable, aborting"
         exit 128
     fi
-fi 
+fi
 
 # Main function, will call the proper functions given the configuration (audit, enabled, disabled)
 if [ -r $CIS_ROOT_DIR/lib/main.sh ]; then
