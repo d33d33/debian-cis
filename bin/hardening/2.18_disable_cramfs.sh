@@ -15,6 +15,7 @@ HARDENING_LEVEL=2
 
 KERNEL_OPTION="CONFIG_CRAMFS"
 MODULE_NAME="cramfs"
+FILE='/etc/modprobe.d/blacklist.conf'
 
 
 # This function will be called if the script status is on enabled / audit mode
@@ -32,7 +33,10 @@ audit () {
 apply () {
     is_kernel_option_enabled $KERNEL_OPTION
     if [ $FNRET = 0 ]; then # 0 means true in bash, so it IS activated
-        warn "I cannot fix $KERNEL_OPTION enabled, recompile your kernel please"
+        warn "$KERNEL_OPTION is enabled!"
+        touch $FILE
+        chmod 644 $FILE
+        add_end_of_file $FILE "blacklist $KERNEL_OPTION"
     else
         ok "$KERNEL_OPTION is disabled, nothing to do"
     fi
@@ -54,7 +58,7 @@ else
         echo "No CIS_ROOT_DIR variable, aborting"
         exit 128
     fi
-fi 
+fi
 
 # Main function, will call the proper functions given the configuration (audit, enabled, disabled)
 if [ -r $CIS_ROOT_DIR/lib/main.sh ]; then
