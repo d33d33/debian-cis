@@ -20,7 +20,7 @@ KERNEL_OPTION="CONFIG_AUDIT"
 
 # This function will be called if the script status is on enabled / audit mode
 audit () {
-    is_kernel_option_enabled "^$KERNEL_OPTION="
+    is_kernel_option_enabled $KERNEL_OPTION
     if [ $FNRET = 0 ]; then # 0 means true in bash, so it IS activated
         ok "$KERNEL_OPTION is enabled"
     else
@@ -31,7 +31,7 @@ audit () {
 
 # This function will be called if the script status is on enabled mode
 apply () {
-    is_kernel_option_enabled "^$KERNEL_OPTION="
+    is_kernel_option_enabled $KERNEL_OPTION
     if [ $FNRET = 0 ]; then # 0 means true in bash, so it IS activated
         ok "$KERNEL_OPTION is enabled"
     else
@@ -55,7 +55,7 @@ else
         echo "No CIS_ROOT_DIR variable, aborting"
         exit 128
     fi
-fi 
+fi
 
 # Main function, will call the proper functions given the configuration (audit, enabled, disabled)
 if [ -r $CIS_ROOT_DIR/lib/main.sh ]; then
